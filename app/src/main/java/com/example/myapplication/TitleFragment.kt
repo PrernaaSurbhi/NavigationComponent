@@ -12,6 +12,7 @@ import com.example.myapplication.databinding.TitleFragmentBinding
  * Created by PrernaSurbhi on 29/01/22.
  */
 class TitleFragment: Fragment() {
+    //this fragmnet is for title fragment
     lateinit var binding: TitleFragmentBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
