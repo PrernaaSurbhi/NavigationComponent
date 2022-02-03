@@ -16,54 +16,84 @@ import com.example.myapplication.databinding.FragmentGameBinding
 class GameFragment : Fragment() {
     //added a data class for Question
     data class Question(
-        val text:String,
-        val answers:List<String>
+        val text: String,
+        val answers: List<String>
     )
 
     // The first answer is the correct one.  We randomize the answers before showing the text.
     // All questions must have four answers.  We'd want these to contain references to string
     // resources so we could internationalize. (Or better yet, don't define the questions in code...)
     private val questions: MutableList<Question> = mutableListOf(
-        Question(text = "What is Android Jetpack?",
-            answers = listOf("All of these", "Tools", "Documentation", "Libraries")),
-        Question(text = "What is the base class for layouts?",
-            answers = listOf("ViewGroup", "ViewSet", "ViewCollection", "ViewRoot")),
-        Question(text = "What layout do you use for complex screens?",
-            answers = listOf("ConstraintLayout", "GridLayout", "LinearLayout", "FrameLayout")),
-        Question(text = "What do you use to push structured data into a layout?",
-            answers = listOf("Data binding", "Data pushing", "Set text", "An OnClick method")),
-        Question(text = "What method do you use to inflate layouts in fragments?",
-            answers = listOf("onCreateView()", "onActivityCreated()", "onCreateLayout()", "onInflateLayout()")),
-        Question(text = "What's the build system for Android?",
-            answers = listOf("Gradle", "Graddle", "Grodle", "Groyle")),
-        Question(text = "Which class do you use to create a vector drawable?",
-            answers = listOf("VectorDrawable", "AndroidVectorDrawable", "DrawableVector", "AndroidVector")),
-        Question(text = "Which one of these is an Android navigation component?",
-            answers = listOf("NavController", "NavCentral", "NavMaster", "NavSwitcher")),
-        Question(text = "Which XML element lets you register an activity with the launcher activity?",
-            answers = listOf("intent-filter", "app-registry", "launcher-registry", "app-launcher")),
-        Question(text = "What do you use to mark a layout for data binding?",
-            answers = listOf("<layout>", "<binding>", "<data-binding>", "<dbinding>"))
+        Question(
+            text = "What is Android Jetpack?",
+            answers = listOf("All of these", "Tools", "Documentation", "Libraries")
+        ),
+        Question(
+            text = "What is the base class for layouts?",
+            answers = listOf("ViewGroup", "ViewSet", "ViewCollection", "ViewRoot")
+        ),
+        Question(
+            text = "What layout do you use for complex screens?",
+            answers = listOf("ConstraintLayout", "GridLayout", "LinearLayout", "FrameLayout")
+        ),
+        Question(
+            text = "What do you use to push structured data into a layout?",
+            answers = listOf("Data binding", "Data pushing", "Set text", "An OnClick method")
+        ),
+        Question(
+            text = "What method do you use to inflate layouts in fragments?",
+            answers = listOf(
+                "onCreateView()",
+                "onActivityCreated()",
+                "onCreateLayout()",
+                "onInflateLayout()"
+            )
+        ),
+        Question(
+            text = "What's the build system for Android?",
+            answers = listOf("Gradle", "Graddle", "Grodle", "Groyle")
+        ),
+        Question(
+            text = "Which class do you use to create a vector drawable?",
+            answers = listOf(
+                "VectorDrawable",
+                "AndroidVectorDrawable",
+                "DrawableVector",
+                "AndroidVector"
+            )
+        ),
+        Question(
+            text = "Which one of these is an Android navigation component?",
+            answers = listOf("NavController", "NavCentral", "NavMaster", "NavSwitcher")
+        ),
+        Question(
+            text = "Which XML element lets you register an activity with the launcher activity?",
+            answers = listOf("intent-filter", "app-registry", "launcher-registry", "app-launcher")
+        ),
+        Question(
+            text = "What do you use to mark a layout for data binding?",
+            answers = listOf("<layout>", "<binding>", "<data-binding>", "<dbinding>")
+        )
     )
 
     lateinit var currentQuestion: Question
     lateinit var answers: MutableList<String>
     private var questionIndex = 0
     private val numQuestions = Math.min((questions.size + 1) / 2, 3)
-    lateinit var binding:FragmentGameBinding
+    lateinit var binding: FragmentGameBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_game,container,false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_game, container, false)
         // Shuffles the questions and sets the question index to the first question.
         randomizeQuestions()
 
         // Bind this fragment class to the layout
         binding.game = this
 
-        binding?.submitButton.setOnClickListener {it->
+        binding.submitButton.setOnClickListener { it ->
             val checkedId = binding.questionRadioGroup.checkedRadioButtonId
             // Do nothing if nothing is checked (id == -1)
             if (-1 != checkedId) {
@@ -84,11 +114,20 @@ class GameFragment : Fragment() {
                         binding.invalidateAll()
                     } else {
                         // We've won!  Navigate to the gameWonFragment.
-                        it.findNavController().navigate(R.id.gameFragment_to_gameWonFragment)
+                        //below line is to navigate using navigation graph
+                     //   it.findNavController().navigate(R.id.gameFragment_to_gameWonFragment)
+
+                        //navigate between 2 frag using navigation safe args
+                       it.findNavController().navigate(GameFragmentDirections.gameFragmentToGameWonFragment(numQuestions,questionIndex))
+
                     }
                 } else {
                     // Game over! A wrong answer sends us to the gameOverFragment.
-                    it.findNavController().navigate(R.id.gameFragment_to_gameOverFragment)
+                    //   it.findNavController().navigate(R.id.gameFragment_to_gameOverFragment)
+
+                    //navigate between two fragmnet using nav args
+                    it.findNavController()
+                        .navigate(GameFragmentDirections.gameFragmentToGameOverFragment())
                 }
             }
         }
@@ -110,6 +149,7 @@ class GameFragment : Fragment() {
         answers = currentQuestion.answers.toMutableList()
         // and shuffle them
         answers.shuffle()
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_android_trivia_question, questionIndex + 1, numQuestions)
+        (activity as AppCompatActivity).supportActionBar?.title =
+            getString(R.string.title_android_trivia_question, questionIndex + 1, numQuestions)
     }
 }
